@@ -7,23 +7,26 @@ import json
 
 bot = telebot.TeleBot('6037374947:AAEXNzxXZRH6y8q8cMrZ3gmeEUpOLb7b0WQ')
 
-Dollar_Uah_NB = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
-headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
-infa1 = requests.get(Dollar_Uah_NB, headers=headers).json()
-#data = json.loads(infa1.text)
-print(infa1)
-
-
 
 @bot.message_handler(commands=['kurs'])
 def kurs(message):
-    
+    Dollar_Uah_PB = 'https://api.privatbank.ua/p24api/pubinfo?exchange&json&coursid=11'
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
+    infa2 = requests.get(Dollar_Uah_PB, headers=headers).json()
+    infa_dol1 = infa2[1]
+    kurs_pb_dol = str(infa_dol1['buy'])
+    Dollar_Uah_NB = 'https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?json'
+    headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
+    infa1 = requests.get(Dollar_Uah_NB, headers=headers).json()
+    infa_dol = infa1[24]
+    kurs_nb_dol = str(infa_dol['rate'])
+    #print("Національний Банк:" + kurs_nb_dol +"грн")
     Dollar_Uah_G = 'https://www.google.com/search?q=%D0%BA%D1%83%D1%80%D1%81+%D0%B4%D0%BE%D0%BB%D0%BB%D0%B0%D1%80%D0%B0+%D0%BD%D0%B0+%D1%81%D0%B5%D0%B3%D0%BE%D0%B4%D0%BD%D1%8F&sxsrf=APwXEdfSqNUFc2-p36ghGeKWLHGwIbgf-A%3A1681142965961&source=hp&ei=tTQ0ZP26OMOG8gLy55PYBA&iflsig=AOEireoAAAAAZDRCxS3zDRcHkJHULf3nITpR5x2vMy8u&oq=rehc+&gs_lcp=Cgdnd3Mtd2l6EAMYADIMCCMQsQIQJxBGEIICMgcIABCKBRBDMg0IABCABBCxAxCDARAKMgsIABCKBRAKEAEQQzINCAAQgAQQsQMQgwEQCjILCAAQigUQChABEEMyCwgAEIoFEAoQARBDMgkIABCKBRAKEEMyBwgAEIAEEAoyDQgAEIAEELEDEIMBEAo6BAgjECc6DgguEIAEELEDEIMBENQCOgsIABCABBCxAxCDAToUCC4QgAQQsQMQgwEQxwEQ0QMQ1AI6BQgAEIAEOggIABCABBCxAzoNCC4QigUQxwEQ0QMQQzoNCAAQigUQsQMQgwEQQzoRCC4QgAQQsQMQgwEQxwEQ0QM6DgguEIAEELEDEMcBENEDOhMILhCKBRCxAxCDARDHARDRAxBDOgkIABCABBAKEAE6BwgjELECECdQAFixBmCRHGgAcAB4AIABZ4gBxwOSAQM0LjGYAQCgAQE&sclient=gws-wiz'
     headers = {'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/111.0'}
     infa = requests.get(Dollar_Uah_G, headers=headers)
     soup = BeautifulSoup(infa.content, "lxml")
     convert = soup.find_all("span", {"class": "DFlfde SwHCTb", "data-precision": "2"})
-    bot.reply_to(message, "Долар на сьогодні:" + convert[0].text + "грн")
+    bot.reply_to(message, "Долар на сьогодні:\n" + "Google каже:" + ' ' + convert[0].text + "грн\n" + "НацБанк каже:" + ' ' + kurs_nb_dol +"грн\n" + "Privat каже:" + ' ' + kurs_pb_dol + "грн")
 
 @bot.message_handler(commands=['start'])
 def istart(message:telebot.types.Message):
