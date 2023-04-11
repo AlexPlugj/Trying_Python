@@ -3,10 +3,11 @@ import random
 import requests
 from bs4 import BeautifulSoup
 import json
-
+import openai
 
 bot = telebot.TeleBot('6037374947:AAEXNzxXZRH6y8q8cMrZ3gmeEUpOLb7b0WQ')
-
+openai.api_key = ('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')
+client_status = {}
 
 @bot.message_handler(commands=['kurs'])
 def kurs(message):
@@ -41,21 +42,41 @@ def prognoz(message):
 
 @bot.message_handler(commands=['kek'])
 def keknut(message):
-   kkk = f'lol,kek,cheburek'
+   kkk = f'Лол, Кек, Чебурек'
    bot.reply_to(message, kkk)
 
- #  @bot.message_handler(commands=['kurs'])
+@bot.message_handler(commands=['speak'])
+def speak(message):
+    client_id = message.from_user.id
+    client_status[client_id] = 'wait_for_data'
+    bot.reply_to(message, text='Введіть текст: ')
+
+@bot.message_handler(content_types=['text'])
+def handler(message):
+    client_id = message.from_user.id
+    if client_id in client_status and client_status[client_id] == 'wait_for_data':
+     response = openai.Completion.create(
+     model="text-davinci-003",
+     prompt= message.text,
+     temperature=0.5,
+     max_tokens=2000,
+     top_p=1.0,
+     frequency_penalty=0.5,
+     presence_penalty=0.0,
+     )
+    bot.reply_to(message, text=response['choices'][0]['text'])
+    del client_status[client_id]
+
 
 
 #@bot.message_handler(func=lambda m: True)
 #def vidp(message: telebot.types.Message):
-#       print(message)
-#       if message.text == "pidor":
-#         bot.reply_to(message, "Sam ti pidor")
-#       elif message.text == "Pizdec":
-#         bot.reply_to(message, "Idy na huy")
-#       else:
-#          bot.reply_to(message, "Blyat")       
+       #if message.text == ("підор"):
+        # bot.reply_to(message, "Сам ти підор")
+       #elif message.text == ("піздец"):
+       #  bot.reply_to(message, "Йди на хуй")
+#    #    bot.reply_to(message, "Бля")   
+
+
 
 bot.infinity_polling()
-
