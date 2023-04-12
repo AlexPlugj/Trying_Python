@@ -1,13 +1,24 @@
 import telebot
+import telegram
+from telegram import MessageEntity
+from telegram.ext import Updater
 import random
 import requests
 from bs4 import BeautifulSoup
 import json
 import openai
+import pymysql
+from config import host, user, password, db_name
+import os
+
+
 
 bot = telebot.TeleBot('6037374947:AAEXNzxXZRH6y8q8cMrZ3gmeEUpOLb7b0WQ')
-openai.api_key = ('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')
+openai.api_key = ('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')
 client_status = {}
+
+
+
 
 @bot.message_handler(commands=['kurs'])
 def kurs(message):
@@ -31,15 +42,20 @@ def kurs(message):
 
 @bot.message_handler(commands=['start'])
 def istart(message:telebot.types.Message):
-    mess = f'Hi, {message.from_user.first_name} {message.from_user.last_name}, ti pidor'
+    fam = message.from_user.last_name
+    if fam == 'None':
+     mess = f'Hi, {message.from_user.first_name}, ti pidor'
+    else:
+     mess = f'Hi, {message.from_user.first_name} {message.from_user.last_name}, ti pidor'
     bot.reply_to(message, mess, parse_mode='html')
-
+  
 @bot.message_handler(commands=['prognoz'])
 def prognoz(message):
       list1 = ["Поставиш сьогодні Плужку каву", "Поставиш сьогодні Плужку пиво", "Накормиш сьогодні Плужка", "Підеш нахуй", "Підеш в дупу"]
       ppp = random.randint(0, len(list1) - 1)
       bot.reply_to(message, list1[ppp])
 
+  
 @bot.message_handler(commands=['kek'])
 def keknut(message):
    kkk = f'Лол, Кек, Чебурек'
@@ -68,6 +84,7 @@ def handler(message):
     del client_status[client_id]
 
 
+   
 
 #@bot.message_handler(func=lambda m: True)
 #def vidp(message: telebot.types.Message):
@@ -75,7 +92,16 @@ def handler(message):
         # bot.reply_to(message, "Сам ти підор")
        #elif message.text == ("піздец"):
        #  bot.reply_to(message, "Йди на хуй")
-#    #    bot.reply_to(message, "Бля")   
+#    response = openai.Completion.create(
+#     model="text-davinci-003",
+#     prompt= message.text,
+#     temperature=0.5,
+#     max_tokens=1000,
+#     top_p=1.0,
+#     frequency_penalty=0.5,
+#     presence_penalty=0.0,
+#    )
+#    bot.reply_to(message, text=response['choices'][0]['text'])   
 
 
 
